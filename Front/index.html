@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prueba de API</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-4Q6Gf2aSP4eDXB8Miphtr37CMZZQ5oXLH2yaXMJ2w8e2ZtHTl7GptT4jmndRuHDT" crossorigin="anonymous">
+
+    <!-- Hoja de estilos personalizada -->
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="container bg-dark text-light rounded-3 p-5 mt-3">
+
+        <!------------------------------------------------------------------------------------------>
+        <!-- Lista de usuarios -->
+        <!------------------------------------------------------------------------------------------>
+        <div class="col-lg-10 mx-auto">
+            <h1>Lista de usuarios</h1>
+            <div id="testBody" class="row rounded mx-auto m-4 text-center"></div>
+        </div>
+
+        <hr>
+
+        <!------------------------------------------------------------------------------------------>
+        <!-- FORMULARIOS -->
+        <!------------------------------------------------------------------------------------------>
+        <!-- Formulario para añadir un nuevo usuario -->
+        <form id="uploadForm" class="my-4 bg-light text-dark p-4 rounded col-lg-6 mx-auto" enctype="multipart/form-data">
+            <h1>Registro de usuarios</h1>
+            <label for="usr_name" class="form-label">Nombre</label>
+            <input type="text" class="form-control" id="usr_name" name="usr_name" required>
+            <label for="usr_email" class="form-label">Email</label>
+            <input type="email" class="form-control" id="usr_email" name="usr_email" required>
+            <label for="usr_pass" class="form-label">Contraseña</label>
+            <input type="password" class="form-control" id="usr_pass" name="usr_pass" required>
+            <label for="imagen" class="form-label">Imagen</label>
+            <input type="file" class="form-control" id="imagen" name="imagen" accept="image/*" required>
+            <div class="row">
+                <button type="submit" class="btn btn-primary col-lg-4 mx-auto mt-3">Registrar usuario</button>
+            </div>
+        </form>
+
+        <hr>
+
+        <!-- Formulario para iniciar sesión -->
+        <form id="loginForm" class="my-4 bg-light text-dark p-4 rounded col-lg-6 mx-auto">
+            <h1 class="text-center">Iniciar sesión</h1>
+            <div class="mb-3">
+                <label for="usr_email_login" class="form-label">Email</label>
+                <input type="email" class="form-control" id="usr_email_login" name="usr_email_login" required>
+                <label for="usr_pass_login" class="form-label">Contraseña</label>
+                <input type="password" class="form-control" id="usr_pass_login" name="usr_pass_login" required>
+                <div class="row">
+                    <button type="submit" class="btn btn-primary col-lg-4 mx-auto mt-3">Iniciar sesión</button>
+                </div>
+            </div>
+        </form>
+
+        <!------------------------------------------------------------------------------------------>
+        <!-- PRUEBA MANUAL DE API KEY -->
+        <!------------------------------------------------------------------------------------------>
+        <div id="testKey" class="row">
+            <form id="testKeyForm" class="my-4 bg-light text-dark p-4 rounded col-lg-6 mx-auto">
+                <h3>Prueba manual de API KEY</h3>
+                <label for="usr_key_test" class="form-label">Clave de usuario en API: <strong id="usr_key_test_label"></strong></label>
+                <input type="text" class="form-control" id="usr_key_test" name="usr_key_test" required>
+                <div class="row">
+                    <button type="submit" class="btn btn-primary col-lg-4 mx-auto mt-3">Probar clave</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- cerrar sesión -->
+        <form id="logoutForm" class="my-4 bg-light text-dark p-4 rounded col-lg-6 mx-auto">
+            <h1 class="text-center">Cerrar sesión</h1>
+            <input type="hidden" id="usr_key_logout" name="usr_key" value="">
+            <div class="row">
+                <button type="submit" class="btn btn-danger col-lg-4 mx-auto mt-3">Cerrar sesión</button>
+            </div>
+        </form>
+    </div>
+
+    <!------------------------------------------------------------------------------------------>
+    <!-- SCRIPTS -->
+    <!------------------------------------------------------------------------------------------>
+    <!-- Solicitud POST para añadir un nuevo usuario a la API -->
+    <script>
+        document.getElementById('uploadForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const form = e.target;
+            const fileInput = form.imagen;
+            const file = fileInput.files[0];
+
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                const data = {
+                    usr_name: form.usr_name.value,
+                    usr_email: form.usr_email.value,
+                    usr_pass: form.usr_pass.value,
+                    imagen: event.target.result // base64
+                };
+
+                console.log(JSON.stringify(data));
+
+                fetch('../API/api.php/usuarios', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                })
+                .then(response => response.json())
+                .then(data => {
+                    alert('Usuario registrado correctamente');
+                    //location.reload();
+                })
+                .catch(error => {
+                    alert('Error al registrar usuario');
+                    console.error(error);
+                });
+            };
+            reader.readAsDataURL(file);
+        });
+    </script>
+
+    <!-- Solicitud GET para obtener los usuarios de la API -->
+    <script>
+        // Define la URL de la API
+        const apiUrl = '../API/api.php/usuarios';
+        // Ejecuta la solicitud GET a la API para obtener los usuarios
+        fetch(apiUrl)
+        .then(response => {
+            if (!response.ok) {
+            throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log(data);
+            // Llama a la función para cargar los usuarios en la tabla HTML
+            loadUsuarios(data);
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+    </script>
+
+    <!-- Función para cargar los usuarios en una tabla HTML -->
+    <script>
+        function loadUsuarios(data) {
+            // Crea una tabla HTML para mostrar los usuarios
+            var table = document.createElement("table");
+            table.border = "1";
+            // Añade una fila de encabezado a la tabla.
+            var row = table.insertRow(-1);
+            // Añade las celdas de encabezado.
+            var headerCell = document.createElement("TH");
+            headerCell.innerHTML = "ID";
+            row.appendChild(headerCell);
+            headerCell = document.createElement("TH");
+            headerCell.innerHTML = "Nombre";
+            row.appendChild(headerCell);
+            headerCell = document.createElement("TH");
+            headerCell.innerHTML = "Email";
+            row.appendChild(headerCell);
+            headerCell = document.createElement("TH");
+            headerCell.innerHTML = "Imágen";
+            row.appendChild(headerCell);
+            // Añade las filas de datos a la tabla.
+            for (var i = 0; i < data.length; i++) {
+                // Crea una nueva fila para cada usuario.
+                var row = table.insertRow(-1);
+                // Añade las celdas de datos a la fila.
+                var cell = row.insertCell(-1);
+                cell.innerHTML = data[i].id;
+                cell = row.insertCell(-1);
+                cell.innerHTML = data[i].usr_name;
+                cell = row.insertCell(-1);
+                cell.innerHTML = data[i].usr_email;
+                cell = row.insertCell(-1);
+                cell.innerHTML = "<img src='../API/uploads/" + data[i].imagen + "' alt='Imagen de usuario' style='width: 100px; height: auto;'>";
+            }
+            var dvTable = document.getElementById("testBody");
+            // Limpia el contenido del div y añade la tabla.
+            dvTable.innerHTML = "";
+            // Añade la tabla al elemento con id "testBody".
+            dvTable.appendChild(table);
+        }
+    </script>
+
+    <!-- Solicitud POST para iniciar sesión con la API -->
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const form = e.target;
+            const data = {
+                usr_email: form.usr_email_login.value,
+                usr_pass: form.usr_pass_login.value
+            };
+            fetch('../API/api.php/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Inicio de sesión exitoso, bienvenido ' + data.usuario[0]);
+                    // Redirigir a otra página o realizar otra acción
+                    // Carga los datos del usuario en el formulario de test y cierre de sesión
+                    document.getElementById('testKey').style.display = 'block';
+                    document.getElementById('logoutForm').style.display = 'block';
+                    document.getElementById('loginForm').style.display = 'none';
+                    document.getElementById('usr_key_test').value = data.usuario[2];
+                    document.getElementById('usr_key_test_label').textContent = data.usuario[2];
+                } else {
+                    alert('Error al iniciar sesión: ' + data.error);
+                }
+            })
+            .catch(error => {
+                alert('Error al iniciar sesión');
+                console.error(error);
+            });
+        });
+    </script>
+
+    <!-- solicitud POST para testear key con API -->
+    <script>
+        document.getElementById('testKeyForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const form = e.target;
+            const data = {
+                key: form.usr_key_test.value
+            };
+            fetch('../API_test/api.php/testkey', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Clave de usuario válida');
+                } else {
+                    alert('Clave de usuario inválida: ' + data.error);
+                }
+            })
+            .catch(error => {
+                alert('Error al probar la clave de usuario');
+                console.error(error);
+            });
+        });
+    </script>
+
+    <!-- solicitud POST para cerrar sesión con API -->
+    <script>
+        document.getElementById('logoutForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const form = e.target;
+            const data = {
+                usr_key: form.usr_key.value
+            };
+            fetch('../API/api.php/logout', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Sesión cerrada correctamente');
+                    // Redirigir a otra página o realizar otra acción
+                    location.reload();
+                } else {
+                    alert('Error al cerrar sesión: ' + data.error);
+                }
+            })
+            .catch(error => {
+                alert('Error al cerrar sesión');
+                console.error(error);
+            });
+        });
+    </script>
+
+    <!-- Bootstrap -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js" integrity="sha384-j1CDi7MgGQ12Z7Qab0qlWQ/Qqz24Gc6BM0thvEMVjHnfYGF0rmFCozFSxQBxwHKO" crossorigin="anonymous"></script>
+</body>
+</html>
