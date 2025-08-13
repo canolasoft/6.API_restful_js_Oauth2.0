@@ -6,6 +6,7 @@ Este proyecto es un ejemplo práctico de implementación de un sistema de **aute
 
 📖 Puedes encontrar la teoría utilizada en este ejemplo en el siguiente enlace:
 > [Enlace 1](https://oauth.net/2/)
+<br>
 > [Enlace 2](https://docs.google.com/document/d/1lhBlLzDBTsm5zI9kWFjIm0B3sWAmhhWgpqg-IGfepcA/edit?tab=t.0#heading=h.7qu730h0wku2)
 
 ---
