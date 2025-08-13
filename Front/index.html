@@ -73,7 +73,7 @@
             </form>
         </div>
 
-        <!-- cerrar sesión -->
+        <!-- cierre de sesión -->
         <form id="logoutForm" class="my-4 bg-light text-dark p-4 rounded col-lg-6 mx-auto">
             <h1 class="text-center">Cerrar sesión</h1>
             <input type="hidden" id="usr_key_logout" name="usr_key" value="">
@@ -150,45 +150,27 @@
 
     <!-- Función para cargar los usuarios en una tabla HTML -->
     <script>
-        function loadUsuarios(data) {
-            // Crea una tabla HTML para mostrar los usuarios
-            var table = document.createElement("table");
-            table.border = "1";
-            // Añade una fila de encabezado a la tabla.
-            var row = table.insertRow(-1);
-            // Añade las celdas de encabezado.
-            var headerCell = document.createElement("TH");
-            headerCell.innerHTML = "ID";
-            row.appendChild(headerCell);
-            headerCell = document.createElement("TH");
-            headerCell.innerHTML = "Nombre";
-            row.appendChild(headerCell);
-            headerCell = document.createElement("TH");
-            headerCell.innerHTML = "Email";
-            row.appendChild(headerCell);
-            headerCell = document.createElement("TH");
-            headerCell.innerHTML = "Imágen";
-            row.appendChild(headerCell);
-            // Añade las filas de datos a la tabla.
-            for (var i = 0; i < data.length; i++) {
-                // Crea una nueva fila para cada usuario.
-                var row = table.insertRow(-1);
-                // Añade las celdas de datos a la fila.
-                var cell = row.insertCell(-1);
-                cell.innerHTML = data[i].id;
-                cell = row.insertCell(-1);
-                cell.innerHTML = data[i].usr_name;
-                cell = row.insertCell(-1);
-                cell.innerHTML = data[i].usr_email;
-                cell = row.insertCell(-1);
-                cell.innerHTML = "<img src='../API/uploads/" + data[i].imagen + "' alt='Imagen de usuario' style='width: 100px; height: auto;'>";
-            }
-            var dvTable = document.getElementById("testBody");
-            // Limpia el contenido del div y añade la tabla.
-            dvTable.innerHTML = "";
-            // Añade la tabla al elemento con id "testBody".
-            dvTable.appendChild(table);
-        }
+    function loadUsuarios(data) {
+        let table = document.createElement("table");
+        table.border = "1";
+        let headers = ["ID", "Nombre", "Email", "Imágen"];
+        let headerRow = table.insertRow();
+        headers.forEach(h => {
+            let th = document.createElement("th");
+            th.innerHTML = h;
+            headerRow.appendChild(th);
+        });
+        data.forEach(u => {
+            let row = table.insertRow();
+            row.insertCell().innerHTML = u.id;
+            row.insertCell().innerHTML = u.usr_name;
+            row.insertCell().innerHTML = u.usr_email;
+            row.insertCell().innerHTML = `<img src='../API/uploads/${u.imagen}' alt='Imagen de usuario' style='width:100px;height:auto;'>`;
+        });
+        let dvTable = document.getElementById("testBody");
+        dvTable.innerHTML = "";
+        dvTable.appendChild(table);
+    }
     </script>
 
     <!-- Solicitud POST para iniciar sesión con la API -->
@@ -211,13 +193,15 @@
             .then(data => {
                 if (data.success) {
                     alert('Inicio de sesión exitoso, bienvenido ' + data.usuario[0]);
-                    // Redirigir a otra página o realizar otra acción
-                    // Carga los datos del usuario en el formulario de test y cierre de sesión
+                    // Muestra los formularios de test y cierre de sesión
                     document.getElementById('testKey').style.display = 'block';
                     document.getElementById('logoutForm').style.display = 'block';
                     document.getElementById('loginForm').style.display = 'none';
+                    // Carga los datos del usuario en el formulario de test y cierre de sesión
                     document.getElementById('usr_key_test').value = data.usuario[2];
                     document.getElementById('usr_key_test_label').textContent = data.usuario[2];
+                    // Redirigir a otra página o realizar otra acción
+                    // location.href = "otra_pagina.html";
                 } else {
                     alert('Error al iniciar sesión: ' + data.error);
                 }
