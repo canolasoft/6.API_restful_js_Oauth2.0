@@ -5,6 +5,7 @@
 Este proyecto es un ejemplo práctico de implementación de un sistema de **autenticación segura** utilizando **Tokens de acceso** y el estándar **OAuth 2.0**, combinado con **Bootstrap**, **JavaScript** y **Programación Orientada a Objetos (POO) en PHP**.
 
 📖 Puedes encontrar la teoría utilizada en este ejemplo en el siguiente enlace:
+<br>
 <a href="https://oauth.net/2/" target="_blank">Enlace 1</a>
 <br>
 <a href="https://docs.google.com/document/d/1lhBlLzDBTsm5zI9kWFjIm0B3sWAmhhWgpqg-IGfepcA/edit?tab=t.0#heading=h.7qu730h0wku2" target="_blank">Enlace 2</a>
