@@ -112,7 +112,7 @@ class Usuario
 					$result = mysqli_query($this->conn, $query);
 					if ($result) {
 						http_response_code(200);
-						return json_encode(["success" => [$usuario['usr_name'], $usr_email, $usr_key]]);
+						return json_encode(["usuario" => [$usuario['usr_name'], $usr_email, $usr_key]]);
 					} else {
 						http_response_code(500);
 						return json_encode(["error" => "Error al generar el token"]);

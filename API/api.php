@@ -39,7 +39,7 @@ switch ($method) {
 			echo $result;
 		}elseif ($endpoint === '/login') {
 			$data = json_decode(file_get_contents('php://input'), true);
-			$result = $usuarioObj->loginUsuario($data['usr_email'], $data['usr_pass']);
+			$result = $usuarioObj->loginUsuario($data);
 			echo $result;
 		}elseif ($endpoint === '/logout') {
 			// Cierra sesión del usuario
