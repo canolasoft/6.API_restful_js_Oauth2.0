@@ -13,5 +13,5 @@ CREATE TABLE IF NOT EXISTS base_usuarios.access_token (
     fecha_creado DATETIME NOT NULL DEFAULT NOW(),
     fecha_vencimiento DATETIME NOT NULL DEFAULT (NOW() + INTERVAL 12 HOUR),
     PRIMARY KEY (token),
-    FOREIGN KEY (id_usuario) REFERENCES usuario(id)
+    FOREIGN KEY (id_usuario) REFERENCES usuario(id) ON DELETE CASCADE
 );
